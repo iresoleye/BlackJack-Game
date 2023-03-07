@@ -3,24 +3,24 @@ from BlackJackCardAndDeckClasses import Deck
 from PlayerClassandComputerClass import Player
 from PlayerClassandComputerClass import Computer
 
-##name = input("What is your name")
-##bankaccount = int(input("How much money do you have in the bank"))
 
-#You will need to ask for name and bank account prior like above, but it must be like inputs!
-d = "saki"
+
+
 def gameplay():
-    #Why,everytime I re run the function,without the redo function, does it seem to remember the previous number of cards
+    
+    #Collect Player Name and Arbitary Bank Details
     name = input("What is your name")
     bankaccount = int(input("How much money do you have in the bank"))
     
 
-    s = True
-    while s:
-        d = Deck()
+    playing = True
+    while playing:
         p = Player(name,bankaccount)
+        d = Deck()
+        
 
-            
-        print(len(d.deckofcards))
+        #The print statement below is just for me to test the program is working correctly.   
+        #print(len(d.deckofcards))
         amountplayerbets = p.betmoney()
         print("\n ")
 
@@ -30,7 +30,7 @@ def gameplay():
         c.addrandomcard(d.collectrandomcard())
 
         #Create the hidden list. Each item in the list must display the name of the card.
-        #Without having the '.name' function, the item would just be a card class*
+
         c.hiddenlist.append(f"{c.clistofcards[0].name} ({c.clistofcards[0].rank})")
         c.hiddenlist.append("Hidden Card")
 
@@ -38,9 +38,7 @@ def gameplay():
         cdisplaylist = [f"{c.clistofcards[0].name} ({c.clistofcards[0].rank})",f"{c.clistofcards[1].name} ({c.clistofcards[1].rank})"]
         print("The computer has now drawn two cards. Here they partially are: ")
         print(c.hiddenlist)
-    ##  print(f"Also, here is the real list which I am displaying as a test {cdisplaylist}")
-    ##  print(len(d.deckofcards))
-
+        
 
         #Draw Two Random Cards for Player
         p.addrandomcard(d.collectrandomcard())
@@ -52,19 +50,21 @@ def gameplay():
         print(f"{p.name}, you have now drawn two cards. Here they are: ")
         print(pdisplaylist)
         print(f"Here is your total rank: {p.ptotalrank()}")
-        #print(len(d.deckofcards))
+ 
 
 
         pfinalrank = p.ptotalrank()
+        
 
-    #Player Turn - Take the player through a loop of stands and hits
+    #Player Turn - Take the player through a loop of 'stands' and 'hits'
         if p.ptotalrank()==21:
-            #Potentially add code here that stops computer even having a turn?
             playergametime = False
             print("Jackpot already!!")
+            p.depositmoney(2*amountplayerbets)
         elif p.ptotalrank()==11 and (p.plistofcards[0].rank==1 or p.plistofcards[1].rank==1):
             print("Jackpot via initial Ace!")
             pfinalrank = p.ptotalrank()+10
+            p.depositmoney(2*amountplayerbets)
             playergametime = False
         elif p.ptotalrank()<11 and (p.plistofcards[0].rank==1 or p.plistofcards[1].rank==1):
             q = True
@@ -120,12 +120,14 @@ def gameplay():
                     elif p.ptotalrank()==21:
                         print("\n ")
                         print("JACKPOT!!!")
+                        p.depositmoney(2*amountplayerbets)
                         pfinalrank = p.ptotalrank()
                         playergametime = False
 
                     elif (1 in plistofranks) and (p.ptotalrank()+10==21):
                         print("\n ")
                         print("JACKPOT!!!")
+                        p.depositmoney(2*amountplayerbets)
                         pfinalrank = p.ptotalrank()+10
                         playergametime = False
                     elif (1 in plistofranks) and (p.ptotalrank()+10<=21):
@@ -149,13 +151,13 @@ def gameplay():
                 else:
                     print("You did not enter a valid output lol \n")
 
-        #print(f"This is the ptotal rank - {p.ptotalrank()}")
+
         print(f"This is the final rank - {pfinalrank}")
-        #print(len(d.deckofcards))
         print("\n \n \n")
         print(f"This is the computer's full list:\n{cdisplaylist}")
         print(f"This is the computer's total rank:\n{c.ctotalrank()}")
         print("\n ")
+        
     
         #Computer Turn
         if pfinalrank ==21 and ((c.ctotalrank()==11 and (c.clistofcards[0].rank==1 or c.clistofcards[1].rank==1))):
@@ -177,7 +179,8 @@ def gameplay():
         elif c.ctotalrank()>pfinalrank:
             print("You lost")
             
-        #this elif statement is here to make the game more interesting
+        #this elif statement is here to make the game more interesting.
+        #If the computer's total rank equals 17, then the computer will stop drawing
         elif c.ctotalrank()==17:
             if c.ctotalrank()>pfinalrank:
                 print("You lost")
@@ -186,6 +189,7 @@ def gameplay():
                 print("You drew with the computer")
             else:
                 print("You won")
+                p.depositmoney(2*amountplayerbets)
                 
             print(f"Your final rank  is - {pfinalrank}")
             print(f"This is the computer's final rank:\n{c.ctotalrank()}")    
@@ -194,7 +198,6 @@ def gameplay():
             print("The computer will now start drawing cards")
             print("\n \n ")
             n = True
-            #Need to sort out the Ace card situation.
             while n:
                 c.addrandomcard(d.collectrandomcard())
                 clistofranks.append(c.clistofcards[-1].rank)
@@ -202,6 +205,7 @@ def gameplay():
                 if c.ctotalrank()>21:
                     print("After the computer has drawn another card, it appears that:")
                     print("You have won!")
+                    p.depositmoney(2*amountplayerbets)
                     print(f"This is the computer's final list:\n{cdisplaylist}")
                     print(f"Your final rank is: {pfinalrank}")
                     print(f"This is the computer's final rank: {c.ctotalrank()}")
@@ -214,16 +218,19 @@ def gameplay():
                     print(f"This is the computer's final rank: {c.ctotalrank()+10}")
                     n = False
                 
-                #I added this extra elif statement to make the game more playable
+                #I added this extra elif statement to make the game more playable.
+                #Read 2 comments above this one to understand the logic of this elif statement
                 elif c.ctotalrank()==17:
                     n = False
                     if c.ctotalrank()>pfinalrank:
                         print("You lost!")
                     elif c.ctotalrank()==pfinalrank:
                         print("You drew with the computer")
+                        p.depositmoney(amountplayerbets)
                     else:
                         print("The computer has now drawn another card and based on this:")
                         print("You have won!")
+                        p.depositmoney(2*amountplayerbets)
                         print("\n \n \n ")
                         print(f"Your final rank is: {pfinalrank}")
                         print(f"This is the computer's final rank: {c.ctotalrank()}")
@@ -253,26 +260,28 @@ def gameplay():
 
 
         print(len(d.deckofcards))
-        e = True
-        while e:
+        finalquestion = True
+        while finalquestion:
             k = input("Would you like to play another round?\nEnter Y or N.")
             if k.title()=='Y':
-                e = False
-                #d.redo()
-                
+                finalquestion = False
+                bankaccount = p.bankaccount
+                if bankaccount<=0:
+                    print(f"You can't play anymore as you have a negative balance of {bankaccount}")
+                    playing = False
+
 
             elif k.title()=='N':
-                e = False
-                s = False
-                print("The game has ended mate")
+                finalquestion = False
+                playing = False
+                print("The game has ended")
 
             else:
                 print("You did not enter a valid input.\n ")
 
 
-        # The final ranks are still stored
-        # Bank Account doesn't add to account or reduce account
-        # Deck Amounts are still stored
+if __name__=='__main__':
+    gameplay()
         
     
 
